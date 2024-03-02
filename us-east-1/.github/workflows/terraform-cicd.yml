@@ -31,28 +31,37 @@ jobs:
       - name: Extract Region from Input
         id: extract-region
         run: |
-          IFS='/' read -ra ADDR <<< "${{ github.event.inputs.environment }}"
+          IFS='/' read -ra ADDR <<< "${{ inputs.environment }}"
           echo "Region=${ADDR[-1]}" >> $GITHUB_ENV
 
       - name: Configure AWS Credentials 
         uses: aws-actions/configure-aws-credentials@v4
         with:
           audience: sts.amazonaws.com
-          aws-region: ${{ env.Region}}
-          role-to-assume: arn:aws:iam::941374747598:role/DevOps
+          aws-region: ${{ env.Region }}
+          role-to-assume: ${{ secrets.AWS_ROLE}}
 
-      - name: terraform plan
+      - name: Set Terraform Module Path
+        id: set-module-path
         run: |
-          IFS= '/' read -r -a array <<< "${{ inputs.environment }}"
-          module_path="${{ inputs.environment }}"
+          IFS='/' read -r -a array <<< "${{ github.event.inputs.environment }}"
+          module_path="${{ github.event.inputs.environment }}"
+          echo "module_path=$module_path" >> $GITHUB_ENV
           cd $module_path
- #         terraform init
-#        terraform fmt
-          terraform plan -var-file=terraform.tfvars
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_ACCESS_KEY_ID }}
 
+      - name: Terraform Format
+        run: terraform fmt 
+        continue-on-error: true
+
+      - name: Terraform Init
+        run: terraform init
+
+      - name: Terraform Validate
+        run: terraform validate
+
+
+      - name: Terraform Plan
+        run: terraform plan -var-file=terraform.tfvars
 
   deploy: 
     name: apply
@@ -66,22 +75,38 @@ jobs:
           with:
             fetch-depth: 0
 
+      - name: Extract Region from Input
+        id: extract-region
+        run: |
+          IFS='/' read -ra ADDR <<< "${{ inputs.environment }}"
+          echo "Region=${ADDR[-1]}" >> $GITHUB_ENV
+
       - name: Configure AWS Credentials 
         uses: aws-actions/configure-aws-credentials@v4
         with:
           audience: sts.amazonaws.com
-          aws-region: us-east-1
-          role-to-assume: arn:aws:iam::941374747598:role/DevOps
+          aws-region: ${{ env.Region }}
+          role-to-assume: ${{ secrets.AWS_ROLE}}
+
+      - name: Set Terraform Module Path
+        id: set-module-path
+        run: |
+          IFS='/' read -r -a array <<< "${{ github.event.inputs.environment }}"
+          module_path="${{ github.event.inputs.environment }}"
+          echo "module_path=$module_path" >> $GITHUB_ENV
+          cd $module_path
+
+      - name: Terraform Format
+        run: terraform fmt 
+        continue-on-error: true
+
+      - name: Terraform Init
+        run: terraform init
+
+      - name: Terraform Validate
+        run: terraform validate
+
           
       - name: terraform apply
-        run: |
-          IFS= '/' read -r -a array <<< "${{ inputs.environment }}"
-          module_path="${{ inputs.environment }}"
-          cd $module_path
-#          region="${{array[4]}}"
-          terraform init
-          terraform fmt
-          terraform apply -var-file=terraform.tfvars -auto-approve
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        run: terraform apply -var-file=terraform.tfvars -auto-approve
+
