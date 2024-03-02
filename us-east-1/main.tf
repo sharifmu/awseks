@@ -4,7 +4,7 @@ provider "aws" {
   #    role_arn = "arn:aws:iam::941374747598:role/DevOps"
   #  }
 }
-/*
+
 terraform {
   required_providers {
     aws = {
@@ -25,7 +25,7 @@ terraform {
     encrypt = true
   }
 }
-*/
+
 data "aws_caller_identity" "current" {}
 
 locals {
