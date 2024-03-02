@@ -71,8 +71,8 @@ jobs:
     steps: 
       - name: checkout Repository
         uses: actions/checkout@v4
-          with:
-            fetch-depth: 0
+        with:
+          fetch-depth: 0
 
       - name: Extract Region from Input
         id: extract-region
