@@ -1,2 +1,2 @@
 # awseks
-# AWS , Terraform, Github Actions
+# AWS , Terraform, Github Actions , OIDC
