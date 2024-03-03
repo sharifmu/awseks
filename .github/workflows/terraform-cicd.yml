@@ -24,6 +24,10 @@ jobs:
     name: plan
     runs-on: ubuntu-latest
     environment: 'default'
+    
+    permissions:
+          id-token: write
+          contents: read
 
     steps: 
       - name: checkout Repository
