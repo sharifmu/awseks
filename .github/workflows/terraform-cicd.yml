@@ -24,7 +24,7 @@ jobs:
     name: plan
     runs-on: ubuntu-latest
     environment: 'default'
-    
+
     permissions:
           id-token: write
           contents: read
@@ -51,6 +51,8 @@ jobs:
       - name: Set Terraform Module Path
         id: set-module-path
         run: |
+          pwd
+          ls -la
           IFS='/' read -r -a array <<< "${{ inputs.environment }}"
           module_path="${{ inputs.environment }}"
           echo "module_path=$module_path" >> $GITHUB_ENV
