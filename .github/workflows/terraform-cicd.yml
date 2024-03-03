@@ -42,13 +42,13 @@ jobs:
         with:
           audience: sts.amazonaws.com
           aws-region: ${{ env.Region }}
-          role-to-assume: ${{ secrets.AWS_ROLE}}
+          role-to-assume: arn:aws:iam::941374747598:role/DevOps
 
       - name: Set Terraform Module Path
         id: set-module-path
         run: |
-          IFS='/' read -r -a array <<< "${{ github.event.inputs.environment }}"
-          module_path="${{ github.event.inputs.environment }}"
+          IFS='/' read -r -a array <<< "${{ inputs.environment }}"
+          module_path="${{ inputs.environment }}"
           echo "module_path=$module_path" >> $GITHUB_ENV
           cd $module_path
 
@@ -97,8 +97,8 @@ jobs:
       - name: Set Terraform Module Path
         id: set-module-path
         run: |
-          IFS='/' read -r -a array <<< "${{ github.event.inputs.environment }}"
-          module_path="${{ github.event.inputs.environment }}"
+          IFS='/' read -r -a array <<< "${{ inputs.environment }}"
+          module_path="${{ inputs.environment }}"
           echo "module_path=$module_path" >> $GITHUB_ENV
           cd $module_path
 
