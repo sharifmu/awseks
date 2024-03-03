@@ -54,9 +54,10 @@ jobs:
           pwd
           ls -la
           IFS='/' read -r -a array <<< "${{ inputs.environment }}"
-          module_path="${{ inputs.environment }}"
+          module_path="${array[-1]}"
           echo "module_path=$module_path" >> $GITHUB_ENV
           cd $module_path
+
 
       - name: Terraform Format
         run: terraform fmt -check
