@@ -89,19 +89,13 @@ jobs:
           aws-region: ${{ env.Region }}
           role-to-assume: ${{ secrets.AWS_ROLE}}
 
-      - name: Set Terraform Module Path
-        id: set-module-path
-        run: |
+      - name: terraform apply
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        run: | 
           IFS='/' read -r -a array <<< "${{ inputs.environment }}"
           module_path="${array[-1]}"
           echo "module_path=$module_path" >> $GITHUB_ENV
           cd $module_path
-
-
-      - name: Terraform Init
-        run: terraform init
-
-      - name: terraform apply
-        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-        run: terraform apply -var-file=terraform.tfvars -auto-approve
+          terraform init
+          terraform apply -var-file=terraform.tfvars -auto-approve
 
