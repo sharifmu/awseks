@@ -56,7 +56,6 @@ jobs:
       - name: Set Terraform Module Path and Initialize
         id: terraform-setup
         run: |
-          cd ${{ env.module_path }}
           terraform init
           terraform fmt -check
           terraform validate
